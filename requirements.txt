@@ -6,3 +6,6 @@ torch==1.12.1
 transformers==4.21.2
 numpy==1.20.3
 pandas==1.5.0
+matplotlib
+seaborn  # matplotlib 시각화 툴
+sklearn  # 머신러닝 알고리즘

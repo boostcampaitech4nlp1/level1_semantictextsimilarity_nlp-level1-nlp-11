@@ -198,5 +198,8 @@ if __name__ == '__main__':
 
     # output 형식을 불러와서 예측된 결과로 바꿔주고, output.csv로 출력합니다.
     output = pd.read_csv('../data/sample_submission.csv')
-    output['target'] = predictions
+    output['predicted_target'] = predictions
+    output.to_csv('output_diff.csv', index=False)
+    output['target'] = output['predicted_target']
+    del output['predicted_target']
     output.to_csv('output.csv', index=False)
