@@ -6,6 +6,9 @@ lightning_logs/
 *.pt
 *.csv
 
+# wandb
+wandb/
+test-project/
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
