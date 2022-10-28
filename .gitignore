@@ -1,1 +1,9 @@
 .vscode
+*/.ipynb_checkpoints/
+*/lightning_logs/
+.ipynb_checkpoints/
+lightning_logs/
+*.csv
+*.pt
+*/wandb/
+*/test jh/
