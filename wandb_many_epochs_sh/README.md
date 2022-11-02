@@ -14,4 +14,8 @@ nohup bash train_repeat.sh > wandb_train_shell_repeat.out 2> wandb_train_shell_r
 # ps -ef | grep PROCESS_ID
 ps -ef | grep "bash train_repeat.sh"
 ps -ef | grep 2431
+
+# nohup 강제 종료
+# kill -9 PROCESS_ID
+kill -9 2431
 ```
