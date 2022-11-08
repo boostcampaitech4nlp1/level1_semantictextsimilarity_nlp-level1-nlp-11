@@ -5,11 +5,21 @@ import torch
 import torchmetrics
 import pytorch_lightning as pl
 import wandb
+import random
+import numpy as np
 
 from tqdm.auto import tqdm
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning import Trainer
 from omegaconf import OmegaConf
+
+SEED = 42
+np.random.seed(SEED)
+random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed(SEED)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, inputs, targets=[]):
@@ -175,16 +185,19 @@ if __name__ == '__main__':
     
     # wandb
     wandb.init(project='test jh', entity='nlp-11')
+    wandb.run.name = f'{cfg.model.saved_name}_b_{cfg.train.batch_size}_ep_{cfg.train.max_epoch}_lr_{cfg.train.learning_rate}'   
+    
     wandb_logger = WandbLogger(project="test jh")
     
     dataloader = Dataloader(cfg.model.model_name, cfg.train.batch_size, cfg.data.shuffle, cfg.path.train_path, cfg.path.dev_path, cfg.path.test_path, cfg.path.predict_path)
     model = Model(cfg)
 
-    trainer = pl.Trainer(gpus=1, max_epochs=cfg.train.max_epoch,
+    trainer = pl.Trainer(precision=16, gpus=1, max_epochs=cfg.train.max_epoch,
                          logger=wandb_logger, log_every_n_steps=1)
     trainer.fit(model=model, datamodule=dataloader)
     trainer.test(model=model, datamodule=dataloader)
-    torch.save(model, f'{cfg.model.saved_name}.pt')
+    # torch.save(model, f'{cfg.model.saved_name}.pt')
+    torch.save(model, f'{cfg.model.saved_name}_b{cfg.train.batch_size}_ep{cfg.train.max_epoch}_lr{cfg.train.learning_rate}.pt')
     
     
     

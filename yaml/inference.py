@@ -5,11 +5,22 @@ import torch
 import torchmetrics
 import pytorch_lightning as pl
 import wandb
+import random
+import numpy as np
 
 from tqdm.auto import tqdm
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning import Trainer
 from omegaconf import OmegaConf
+
+SEED = 42
+np.random.seed(SEED)
+random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed(SEED)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, inputs, targets=[]):
@@ -172,23 +183,26 @@ if __name__ == '__main__':
     args, _ = parser.parse_known_args()
 
     cfg = OmegaConf.load(f'./config/{args.config}.yaml')
-
+    
     # dataloader와 model을 생성합니다.
     dataloader = Dataloader(cfg.model.model_name, cfg.train.batch_size, cfg.data.shuffle, cfg.path.train_path, cfg.path.dev_path, cfg.path.test_path, cfg.path.predict_path)
 
-    trainer = pl.Trainer(gpus=1, max_epochs=cfg.train.max_epoch,
-                         logger=wandb_logger, log_every_n_steps=1)
+    trainer = pl.Trainer(precision=16, gpus=1, max_epochs=cfg.train.max_epoch, log_every_n_steps=1)
 
     # Inference part
     # 저장된 모델로 예측을 진행합니다.
-    model = torch.load(f'{cfg.model.saved_name}.pt')
+    model = torch.load(f'{cfg.model.saved_name}_b{cfg.train.batch_size}_ep{cfg.train.max_epoch}_lr{cfg.train.learning_rate}.pt')
     predictions = trainer.predict(model=model, datamodule=dataloader)
 
     # 예측된 결과를 형식에 맞게 반올림하여 준비합니다.
-    predictions = list(round(float(i), 1) for i in torch.cat(predictions))
-
+    predictions = list(round(float(i), 1) if i < 5 else 5.0 for i in torch.cat(predictions))      
+    for i in range(len(predictions)):
+        if predictions[i] > 5:
+            predictions[i] = 5.0
+        elif predictions[i] <= 0:
+            predictions[i] = 0.0
     # output 형식을 불러와서 예측된 결과로 바꿔주고, output.csv로 출력합니다.
     output = pd.read_csv('../../data/sample_submission.csv')
     output['target'] = predictions
-    output.to_csv('output.csv', index=False)  
+    output.to_csv(f'output_{cfg.model.saved_name}_b{cfg.train.batch_size}_ep{cfg.train.max_epoch}_lr{cfg.train.learning_rate}.csv', index=False)  
     

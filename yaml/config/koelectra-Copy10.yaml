@@ -16,5 +16,5 @@ train :
     seed : 
     gpus : 1
     batch_size : 32
-    max_epoch : 13
-    learning_rate : 3e-5
+    max_epoch : 15
+    learning_rate : 5e-5
