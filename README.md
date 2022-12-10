@@ -1,4 +1,6 @@
-# ☃️ 엘사(E1I4)지만 자신있조 ☃️ Semantic Text Similarity (STS) Task
+# ☃️ 엘사(E1I4)지만 자신있조 ☃️
+>## Semantic Text Similarity (STS) Task
+
 
 ## Contributors
 - **기윤호 [(Github)](https://github.com/yhkee0404) : 데이터 팀, 모델링 팀**
@@ -30,16 +32,12 @@
 
 
 ## 프로젝트 구조
-
-    ```bash
         ├─ baseline
         ├─ model_experiments
         ├─ wandb_sweep
         ├─ wandb_many_epochs_sh
-        ├─ data
         └─ requirements.txt
         └─ .gitignore
-    ```
 
 - model_experiments
     - 1차적으로 다양한 모델 실험
